@@ -90,6 +90,11 @@
         "padding-block-end": 72
       }
     },
+    "new_banner_eUYgAT": {
+      "type": "New-banner",
+      "name": "New Banner",
+      "settings": {}
+    },
     "product_list_fa6P9H": {
       "type": "product-list",
       "blocks": {
@@ -283,16 +288,11 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
-    },
-    "new_banner_eUYgAT": {
-      "type": "New-banner",
-      "name": "New Banner",
-      "settings": {}
     }
   },
   "order": [
     "hero_jVaWmY",
-    "product_list_fa6P9H",
-    "new_banner_eUYgAT"
+    "new_banner_eUYgAT",
+    "product_list_fa6P9H"
   ]
 }
