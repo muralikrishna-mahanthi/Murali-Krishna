@@ -118,17 +118,13 @@
     "new_banner_z4XEzJ": {
       "type": "New-banner",
       "name": "New Banner",
-      "settings": {}
-    },
-    "new_banner_PfQ6QK": {
-      "type": "New-banner",
-      "name": "New Banner",
-      "settings": {}
+      "settings": {
+        "text": ""
+      }
     }
   },
   "order": [
     "hero_eJXFpF",
-    "new_banner_z4XEzJ",
-    "new_banner_PfQ6QK"
+    "new_banner_z4XEzJ"
   ]
 }
