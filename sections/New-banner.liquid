@@ -1,20 +1,256 @@
-<h1>{{section.settings.text}}</h1>
+{% liquid
+  assign banner_id = 'banner-' | append: section.id
+  assign desktop_image = section.settings.desktop_image
+  assign mobile_image = section.settings.mobile_image
+  assign heading = section.settings.heading
+  assign subheading = section.settings.subheading
+  assign button_label = section.settings.button_label
+  assign button_link = section.settings.button_link
+%}
+
+<section
+  id="{{ banner_id }}"
+  class="custom-banner {% if section.settings.full_width %}custom-banner--full{% else %}page-width{% endif %}"
+  data-parallax="{{ section.settings.enable_parallax }}"
+>
+  <div class="custom-banner__media-wrap">
+    {% if desktop_image != blank %}
+      <picture>
+        {% if mobile_image != blank %}
+          <source media="(max-width: 749px)" srcset="{{ mobile_image | image_url: width: 1200 }}">
+        {% endif %}
+        <img
+          class="custom-banner__image"
+          src="{{ desktop_image | image_url: width: 2200 }}"
+          alt="{{ desktop_image.alt | escape }}"
+          width="{{ desktop_image.width }}"
+          height="{{ desktop_image.height }}"
+          loading="lazy"
+        >
+      </picture>
+    {% else %}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'custom-banner__placeholder' }}
+    {% endif %}
+
+    <div class="custom-banner__overlay"></div>
+  </div>
+
+  <div class="custom-banner__content custom-banner__content--{{ section.settings.content_position }} custom-banner__text--{{ section.settings.text_align }}">
+    {% if heading != blank %}
+      <h2 class="custom-banner__heading">{{ heading }}</h2>
+    {% endif %}
+
+    {% if subheading != blank %}
+      <div class="custom-banner__subheading rte">{{ subheading }}</div>
+    {% endif %}
+
+    {% if button_label != blank and button_link != blank %}
+      <a class="custom-banner__button" href="{{ button_link }}">{{ button_label }}</a>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  #{{ banner_id }} {
+    --banner-height-desktop: {{ section.settings.height_desktop }}vh;
+    --banner-height-mobile: {{ section.settings.height_mobile }}vh;
+    --overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --heading-color: {{ section.settings.heading_color }};
+    --text-color: {{ section.settings.text_color }};
+    --button-bg: {{ section.settings.button_bg }};
+    --button-text: {{ section.settings.button_text }};
+    position: relative;
+    min-height: var(--banner-height-desktop);
+    overflow: hidden;
+    border-radius: {{ section.settings.corner_radius }}px;
+  }
+
+  #{{ banner_id }}.custom-banner--full {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #{{ banner_id }} .custom-banner__media-wrap {
+    position: absolute;
+    inset: 0;
+  }
+
+  #{{ banner_id }} .custom-banner__image,
+  #{{ banner_id }} .custom-banner__placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
+
+  #{{ banner_id }} .custom-banner__overlay {
+    position: absolute;
+    inset: 0;
+    background: {{ section.settings.overlay_color }};
+    opacity: var(--overlay-opacity);
+    pointer-events: none;
+  }
+
+  #{{ banner_id }} .custom-banner__content {
+    position: relative;
+    z-index: 2;
+    min-height: var(--banner-height-desktop);
+    display: grid;
+    padding: clamp(16px, 3vw, 56px);
+  }
+
+  #{{ banner_id }} .custom-banner__content--top-left { place-items: start; }
+  #{{ banner_id }} .custom-banner__content--top-center { place-items: start center; }
+  #{{ banner_id }} .custom-banner__content--top-right { place-items: start end; }
+  #{{ banner_id }} .custom-banner__content--middle-left { place-items: center start; }
+  #{{ banner_id }} .custom-banner__content--middle-center { place-items: center; }
+  #{{ banner_id }} .custom-banner__content--middle-right { place-items: center end; }
+  #{{ banner_id }} .custom-banner__content--bottom-left { place-items: end start; }
+  #{{ banner_id }} .custom-banner__content--bottom-center { place-items: end center; }
+  #{{ banner_id }} .custom-banner__content--bottom-right { place-items: end end; }
+
+  #{{ banner_id }} .custom-banner__text--left { text-align: left; }
+  #{{ banner_id }} .custom-banner__text--center { text-align: center; }
+  #{{ banner_id }} .custom-banner__text--right { text-align: right; }
+
+  #{{ banner_id }} .custom-banner__heading {
+    margin: 0;
+    color: var(--heading-color);
+    font-size: clamp(28px, 5vw, 64px);
+    line-height: 1.1;
+    max-width: 18ch;
+  }
+
+  #{{ banner_id }} .custom-banner__subheading {
+    margin-top: 12px;
+    color: var(--text-color);
+    font-size: clamp(14px, 1.5vw, 20px);
+    max-width: 50ch;
+  }
+
+  #{{ banner_id }} .custom-banner__button {
+    margin-top: 18px;
+    display: inline-block;
+    background: var(--button-bg);
+    color: var(--button-text);
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 999px;
+    font-weight: 600;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  #{{ banner_id }} .custom-banner__button:hover {
+    transform: translateY(-1px);
+    opacity: 0.92;
+  }
+
+  @media (max-width: 749px) {
+    #{{ banner_id }} {
+      min-height: var(--banner-height-mobile);
+      border-radius: 0;
+    }
+
+    #{{ banner_id }} .custom-banner__content {
+      min-height: var(--banner-height-mobile);
+      padding: 20px;
+    }
+
+    #{{ banner_id }} .custom-banner__heading {
+      font-size: clamp(24px, 8vw, 42px);
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    const sectionEl = document.getElementById('{{ banner_id }}');
+    if (!sectionEl || sectionEl.dataset.parallax !== 'true') return;
+
+    const imageEl = sectionEl.querySelector('.custom-banner__image');
+    if (!imageEl) return;
+
+    let ticking = false;
+
+    const updateParallax = () => {
+      const rect = sectionEl.getBoundingClientRect();
+      const speed = 0.2;
+      const offset = rect.top * speed;
+      imageEl.style.transform = `translate3d(0, ${offset}px, 0)`;
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateParallax);
+        ticking = true;
+      }
+    };
+
+    updateParallax();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+  })();
+</script>
 
 {% schema %}
 {
-    "name": "Custom sections",
-    "settings": [
-        {
-            "type": "text",
-            "id": "text",
-            "label": "Text"
-        }
-    ],
-    "presets": [
-        {"name": "New Banner"}
-    ],
-    "tag": "header",
-    "class": "custom-section",
-    "limit": 2,
+  "name": "Custom Banner",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "checkbox", "id": "full_width", "label": "Full width", "default": true },
+
+    { "type": "image_picker", "id": "desktop_image", "label": "Desktop image" },
+    { "type": "image_picker", "id": "mobile_image", "label": "Mobile image" },
+
+    { "type": "range", "id": "height_desktop", "label": "Desktop height (vh)", "min": 40, "max": 100, "step": 5, "default": 70 },
+    { "type": "range", "id": "height_mobile", "label": "Mobile height (vh)", "min": 40, "max": 100, "step": 5, "default": 60 },
+
+    { "type": "text", "id": "heading", "label": "Heading", "default": "New Season Arrivals" },
+    { "type": "richtext", "id": "subheading", "label": "Subheading", "default": "<p>Minimal essentials, bold details.</p>" },
+
+    { "type": "select", "id": "content_position", "label": "Content position", "default": "middle-center",
+      "options": [
+        { "value": "top-left", "label": "Top left" },
+        { "value": "top-center", "label": "Top center" },
+        { "value": "top-right", "label": "Top right" },
+        { "value": "middle-left", "label": "Middle left" },
+        { "value": "middle-center", "label": "Middle center" },
+        { "value": "middle-right", "label": "Middle right" },
+        { "value": "bottom-left", "label": "Bottom left" },
+        { "value": "bottom-center", "label": "Bottom center" },
+        { "value": "bottom-right", "label": "Bottom right" }
+      ]
+    },
+
+    { "type": "select", "id": "text_align", "label": "Text align", "default": "center",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop now" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+
+    { "type": "color", "id": "heading_color", "label": "Heading color", "default": "#ffffff" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#ffffff" },
+    { "type": "color", "id": "overlay_color", "label": "Overlay color", "default": "#000000" },
+    { "type": "range", "id": "overlay_opacity", "label": "Overlay opacity", "min": 0, "max": 90, "step": 5, "default": 30 },
+
+    { "type": "color", "id": "button_bg", "label": "Button background", "default": "#ffffff" },
+    { "type": "color", "id": "button_text", "label": "Button text", "default": "#111111" },
+
+    { "type": "range", "id": "corner_radius", "label": "Corner radius", "min": 0, "max": 32, "step": 2, "default": 0 },
+
+    { "type": "checkbox", "id": "enable_parallax", "label": "Enable parallax effect", "default": false }
+  ],
+  "presets": [
+    { "name": "Custom Banner" }
+  ]
 }
-{% endschema %}                 
+{% endschema %}
