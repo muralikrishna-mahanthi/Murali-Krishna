@@ -283,16 +283,10 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
-    },
-    "new_banner_4PbcJw": {
-      "type": "New-banner",
-      "name": "New Banner",
-      "settings": {}
     }
   },
   "order": [
     "hero_jVaWmY",
-    "product_list_fa6P9H",
-    "new_banner_4PbcJw"
+    "product_list_fa6P9H"
   ]
 }
