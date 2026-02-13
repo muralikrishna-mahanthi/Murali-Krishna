@@ -119,10 +119,28 @@
       "type": "New-banner",
       "name": "New Banner",
       "settings": {}
+    },
+    "new_banner_ryaezn": {
+      "type": "New-banner",
+      "name": "New Banner",
+      "settings": {}
+    },
+    "new_banner_YEMc3q": {
+      "type": "New-banner",
+      "name": "New Banner",
+      "settings": {}
+    },
+    "new_banner_RcBcyB": {
+      "type": "New-banner",
+      "name": "New Banner",
+      "settings": {}
     }
   },
   "order": [
     "hero_eJXFpF",
-    "new_banner_z4XEzJ"
+    "new_banner_z4XEzJ",
+    "new_banner_ryaezn",
+    "new_banner_YEMc3q",
+    "new_banner_RcBcyB"
   ]
 }
