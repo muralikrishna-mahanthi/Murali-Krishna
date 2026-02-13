@@ -3,12 +3,18 @@
 {% schema %}
 {
     "name": "Custom sections",
-    "settings": [],
+    "settings": [
+        {
+            "type": "text",
+            "id": "text",
+            "label": "Text"
+        }
+    ],
     "presets": [
         {"name": "New Banner"}
     ],
     "tag": "header",
     "class": "custom-section",
-    
+    "limit": 2,
 }
 {% endschema %}                 
