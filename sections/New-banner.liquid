@@ -1,256 +1,319 @@
 {% liquid
-  assign banner_id = 'banner-' | append: section.id
-  assign desktop_image = section.settings.desktop_image
-  assign mobile_image = section.settings.mobile_image
-  assign heading = section.settings.heading
-  assign subheading = section.settings.subheading
-  assign button_label = section.settings.button_label
-  assign button_link = section.settings.button_link
+  assign sid = 'gift-guide-' | append: section.id
 %}
 
-<section
-  id="{{ banner_id }}"
-  class="custom-banner {% if section.settings.full_width %}custom-banner--full{% else %}page-width{% endif %}"
-  data-parallax="{{ section.settings.enable_parallax }}"
->
-  <div class="custom-banner__media-wrap">
-    {% if desktop_image != blank %}
-      <picture>
-        {% if mobile_image != blank %}
-          <source media="(max-width: 749px)" srcset="{{ mobile_image | image_url: width: 1200 }}">
-        {% endif %}
-        <img
-          class="custom-banner__image"
-          src="{{ desktop_image | image_url: width: 2200 }}"
-          alt="{{ desktop_image.alt | escape }}"
-          width="{{ desktop_image.width }}"
-          height="{{ desktop_image.height }}"
-          loading="lazy"
-        >
-      </picture>
-    {% else %}
-      {{ 'lifestyle-2' | placeholder_svg_tag: 'custom-banner__placeholder' }}
-    {% endif %}
-
-    <div class="custom-banner__overlay"></div>
+<section id="{{ sid }}" class="gg-banner">
+  <div class="gg-topbar">
+    <div class="gg-brand">{{ section.settings.brand_text }}</div>
+    <div class="gg-tagline">{{ section.settings.top_message }}</div>
+    <a class="gg-choose-btn" href="{{ section.settings.choose_gift_link | default: '#' }}">
+      <span>{{ section.settings.choose_gift_text }}</span>
+      <span class="gg-arrow">→</span>
+    </a>
   </div>
 
-  <div class="custom-banner__content custom-banner__content--{{ section.settings.content_position }} custom-banner__text--{{ section.settings.text_align }}">
-    {% if heading != blank %}
-      <h2 class="custom-banner__heading">{{ heading }}</h2>
-    {% endif %}
-
-    {% if subheading != blank %}
-      <div class="custom-banner__subheading rte">{{ subheading }}</div>
-    {% endif %}
-
-    {% if button_label != blank and button_link != blank %}
-      <a class="custom-banner__button" href="{{ button_link }}">{{ button_label }}</a>
-    {% endif %}
+  <div class="gg-hero">
+    <div class="gg-overlay-content">
+      <h1>{{ section.settings.heading }}</h1>
+      <div class="gg-copy">{{ section.settings.description }}</div>
+      <a class="gg-shop-btn" href="{{ section.settings.shop_now_link | default: '#' }}">
+        <span>{{ section.settings.shop_now_text }}</span>
+        <span class="gg-arrow">→</span>
+      </a>
+    </div>
   </div>
+
+  <div class="gg-bottom-strip">{{ section.settings.bottom_strip }}</div>
 </section>
 
 <style>
-  #{{ banner_id }} {
-    --banner-height-desktop: {{ section.settings.height_desktop }}vh;
-    --banner-height-mobile: {{ section.settings.height_mobile }}vh;
-    --overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
-    --heading-color: {{ section.settings.heading_color }};
-    --text-color: {{ section.settings.text_color }};
-    --button-bg: {{ section.settings.button_bg }};
-    --button-text: {{ section.settings.button_text }};
+  #{{ sid }} {
+    --bg: {{ section.settings.bg_color }};
+    --ink: {{ section.settings.text_color }};
+    --line: {{ section.settings.border_color }};
+    --top-bg: {{ section.settings.topbar_bg }};
+    --choose-bg: {{ section.settings.choose_btn_bg }};
+    --choose-ink: {{ section.settings.choose_btn_text }};
+    --shop-bg: {{ section.settings.shop_btn_bg }};
+    --shop-ink: {{ section.settings.shop_btn_text }};
+    --max: 1600px;
+
+    background: var(--bg);
+    color: var(--ink);
     position: relative;
-    min-height: var(--banner-height-desktop);
     overflow: hidden;
-    border-radius: {{ section.settings.corner_radius }}px;
   }
 
-  #{{ banner_id }}.custom-banner--full {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  #{{ banner_id }} .custom-banner__media-wrap {
-    position: absolute;
-    inset: 0;
-  }
-
-  #{{ banner_id }} .custom-banner__image,
-  #{{ banner_id }} .custom-banner__placeholder {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transform: translate3d(0, 0, 0);
-    will-change: transform;
-  }
-
-  #{{ banner_id }} .custom-banner__overlay {
-    position: absolute;
-    inset: 0;
-    background: {{ section.settings.overlay_color }};
-    opacity: var(--overlay-opacity);
-    pointer-events: none;
-  }
-
-  #{{ banner_id }} .custom-banner__content {
-    position: relative;
-    z-index: 2;
-    min-height: var(--banner-height-desktop);
+  #{{ sid }} .gg-topbar {
+    background: var(--top-bg);
+    min-height: 74px;
     display: grid;
-    padding: clamp(16px, 3vw, 56px);
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 20px;
+    padding: 10px 48px;
+    border-bottom: 1px solid #d8d8d8;
   }
 
-  #{{ banner_id }} .custom-banner__content--top-left { place-items: start; }
-  #{{ banner_id }} .custom-banner__content--top-center { place-items: start center; }
-  #{{ banner_id }} .custom-banner__content--top-right { place-items: start end; }
-  #{{ banner_id }} .custom-banner__content--middle-left { place-items: center start; }
-  #{{ banner_id }} .custom-banner__content--middle-center { place-items: center; }
-  #{{ banner_id }} .custom-banner__content--middle-right { place-items: center end; }
-  #{{ banner_id }} .custom-banner__content--bottom-left { place-items: end start; }
-  #{{ banner_id }} .custom-banner__content--bottom-center { place-items: end center; }
-  #{{ banner_id }} .custom-banner__content--bottom-right { place-items: end end; }
-
-  #{{ banner_id }} .custom-banner__text--left { text-align: left; }
-  #{{ banner_id }} .custom-banner__text--center { text-align: center; }
-  #{{ banner_id }} .custom-banner__text--right { text-align: right; }
-
-  #{{ banner_id }} .custom-banner__heading {
-    margin: 0;
-    color: var(--heading-color);
-    font-size: clamp(28px, 5vw, 64px);
-    line-height: 1.1;
-    max-width: 18ch;
+  #{{ sid }} .gg-brand,
+  #{{ sid }} .gg-tagline,
+  #{{ sid }} .gg-choose-btn,
+  #{{ sid }} h1,
+  #{{ sid }} .gg-copy,
+  #{{ sid }} .gg-shop-btn,
+  #{{ sid }} .gg-bottom-strip {
+    border: 4px solid var(--line);
   }
 
-  #{{ banner_id }} .custom-banner__subheading {
-    margin-top: 12px;
-    color: var(--text-color);
-    font-size: clamp(14px, 1.5vw, 20px);
-    max-width: 50ch;
+  #{{ sid }} .gg-brand,
+  #{{ sid }} .gg-tagline,
+  #{{ sid }} .gg-choose-btn {
+    border-width: 4px;
   }
 
-  #{{ banner_id }} .custom-banner__button {
-    margin-top: 18px;
-    display: inline-block;
-    background: var(--button-bg);
-    color: var(--button-text);
+  #{{ sid }} .gg-brand {
+    justify-self: start;
+    font-size: 48px;
+    line-height: 1;
+    letter-spacing: 1px;
+    font-weight: 500;
+    padding: 10px 18px;
+    background: #fff;
+  }
+
+  #{{ sid }} .gg-tagline {
+    justify-self: center;
+    background: #fff;
+    padding: 10px 26px;
+    font-size: 42px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  #{{ sid }} .gg-choose-btn {
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    gap: 24px;
     text-decoration: none;
-    padding: 12px 20px;
-    border-radius: 999px;
-    font-weight: 600;
-    transition: transform 0.2s ease, opacity 0.2s ease;
+    background: var(--choose-bg);
+    color: var(--choose-ink);
+    padding: 14px 42px;
+    font-size: 42px;
+    line-height: 1;
   }
 
-  #{{ banner_id }} .custom-banner__button:hover {
-    transform: translateY(-1px);
-    opacity: 0.92;
+  #{{ sid }} .gg-hero {
+    min-height: clamp(620px, 72vh, 980px);
+    background-color: var(--bg);
+    {% if section.settings.background_image != blank %}
+      background-image: url('{{ section.settings.background_image | image_url: width: 3000 }}');
+    {% endif %}
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+  }
+
+  #{{ sid }} .gg-overlay-content {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: clamp(40px, 6vw, 84px) clamp(20px, 4vw, 70px) clamp(44px, 8vw, 100px);
+    display: grid;
+    gap: 24px;
+    justify-items: start;
+  }
+
+  #{{ sid }} h1 {
+    margin: 0;
+    background: #fff;
+    padding: 12px 18px;
+    font-size: clamp(44px, 5vw, 88px);
+    line-height: .98;
+    font-weight: 600;
+  }
+
+  #{{ sid }} .gg-copy {
+    background: #fff;
+    padding: 12px 18px;
+    max-width: 980px;
+    font-size: clamp(28px, 2.2vw, 48px);
+    line-height: 1.35;
+  }
+
+  #{{ sid }} .gg-shop-btn {
+    margin-top: 2px;
+    text-decoration: none;
+    background: #fff;
+    padding: 16px;
+    display: inline-block;
+  }
+
+  #{{ sid }} .gg-shop-btn > span:first-child,
+  #{{ sid }} .gg-shop-btn > .gg-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--shop-bg);
+    color: var(--shop-ink);
+    height: 72px;
+    font-size: 38px;
+    line-height: 1;
+    border: 0;
+  }
+
+  #{{ sid }} .gg-shop-btn > span:first-child {
+    padding: 0 30px;
+    border-right: 0;
+  }
+
+  #{{ sid }} .gg-shop-btn > .gg-arrow {
+    width: 72px;
+    margin-left: -6px;
+  }
+
+  #{{ sid }} .gg-bottom-strip {
+    position: absolute;
+    left: 50%;
+    bottom: 8px;
+    transform: translateX(-50%);
+    background: #fff;
+    padding: 4px 12px;
+    font-size: clamp(14px, 1.2vw, 40px);
+    white-space: nowrap;
+    z-index: 3;
+  }
+
+  #{{ sid }} .gg-arrow {
+    font-weight: 500;
+  }
+
+  @media (max-width: 1100px) {
+    #{{ sid }} .gg-topbar {
+      grid-template-columns: 1fr;
+      justify-items: center;
+      padding: 14px 16px;
+      gap: 12px;
+    }
+
+    #{{ sid }} .gg-brand,
+    #{{ sid }} .gg-tagline,
+    #{{ sid }} .gg-choose-btn {
+      justify-self: center;
+      white-space: normal;
+      text-align: center;
+    }
+
+    #{{ sid }} .gg-brand {
+      font-size: clamp(28px, 5vw, 44px);
+    }
+
+    #{{ sid }} .gg-tagline {
+      font-size: clamp(18px, 3.2vw, 34px);
+      padding: 10px 14px;
+    }
+
+    #{{ sid }} .gg-choose-btn {
+      font-size: clamp(18px, 3.2vw, 34px);
+      gap: 12px;
+      padding: 12px 20px;
+    }
   }
 
   @media (max-width: 749px) {
-    #{{ banner_id }} {
-      min-height: var(--banner-height-mobile);
-      border-radius: 0;
+    #{{ sid }} .gg-hero {
+      min-height: 78vh;
+      background-position: center top;
     }
 
-    #{{ banner_id }} .custom-banner__content {
-      min-height: var(--banner-height-mobile);
-      padding: 20px;
+    #{{ sid }} .gg-overlay-content {
+      gap: 16px;
+      padding: 26px 14px 72px;
     }
 
-    #{{ banner_id }} .custom-banner__heading {
-      font-size: clamp(24px, 8vw, 42px);
+    #{{ sid }} h1 {
+      font-size: clamp(36px, 10vw, 58px);
+      padding: 10px 12px;
+    }
+
+    #{{ sid }} .gg-copy {
+      font-size: clamp(18px, 5.2vw, 28px);
+      padding: 10px 12px;
+      max-width: 100%;
+    }
+
+    #{{ sid }} .gg-shop-btn {
+      padding: 10px;
+    }
+
+    #{{ sid }} .gg-shop-btn > span:first-child,
+    #{{ sid }} .gg-shop-btn > .gg-arrow {
+      height: 52px;
+      font-size: 24px;
+    }
+
+    #{{ sid }} .gg-shop-btn > .gg-arrow {
+      width: 52px;
+      margin-left: -4px;
+    }
+
+    #{{ sid }} .gg-bottom-strip {
+      font-size: 12px;
+      bottom: 6px;
+      padding: 4px 8px;
+      max-width: calc(100% - 20px);
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 </style>
 
 <script>
-  (() => {
-    const sectionEl = document.getElementById('{{ banner_id }}');
-    if (!sectionEl || sectionEl.dataset.parallax !== 'true') return;
+  (function () {
+    var root = document.getElementById('{{ sid }}');
+    if (!root) return;
 
-    const imageEl = sectionEl.querySelector('.custom-banner__image');
-    if (!imageEl) return;
+    // Ensures mobile viewport height behaves consistently across browsers.
+    function setVh() {
+      root.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
+    }
 
-    let ticking = false;
-
-    const updateParallax = () => {
-      const rect = sectionEl.getBoundingClientRect();
-      const speed = 0.2;
-      const offset = rect.top * speed;
-      imageEl.style.transform = `translate3d(0, ${offset}px, 0)`;
-      ticking = false;
-    };
-
-    const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(updateParallax);
-        ticking = true;
-      }
-    };
-
-    updateParallax();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
+    setVh();
+    window.addEventListener('resize', setVh);
   })();
 </script>
 
 {% schema %}
 {
-  "name": "Custom Banner",
-  "tag": "section",
-  "class": "section",
+  "name": "Gift Guide Banner",
   "settings": [
-    { "type": "checkbox", "id": "full_width", "label": "Full width", "default": true },
+    { "type": "image_picker", "id": "background_image", "label": "Background image" },
 
-    { "type": "image_picker", "id": "desktop_image", "label": "Desktop image" },
-    { "type": "image_picker", "id": "mobile_image", "label": "Mobile image" },
+    { "type": "text", "id": "brand_text", "label": "Brand text", "default": "TISSO VISON" },
+    { "type": "text", "id": "top_message", "label": "Top message", "default": "Find the ideal gift for your loved ones." },
+    { "type": "text", "id": "choose_gift_text", "label": "Choose gift button text", "default": "CHOOSE GIFT" },
+    { "type": "url", "id": "choose_gift_link", "label": "Choose gift button link" },
 
-    { "type": "range", "id": "height_desktop", "label": "Desktop height (vh)", "min": 40, "max": 100, "step": 5, "default": 70 },
-    { "type": "range", "id": "height_mobile", "label": "Mobile height (vh)", "min": 40, "max": 100, "step": 5, "default": 60 },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The Gift Guide" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season." },
 
-    { "type": "text", "id": "heading", "label": "Heading", "default": "New Season Arrivals" },
-    { "type": "richtext", "id": "subheading", "label": "Subheading", "default": "<p>Minimal essentials, bold details.</p>" },
+    { "type": "text", "id": "shop_now_text", "label": "Shop now button text", "default": "SHOP NOW" },
+    { "type": "url", "id": "shop_now_link", "label": "Shop now button link" },
 
-    { "type": "select", "id": "content_position", "label": "Content position", "default": "middle-center",
-      "options": [
-        { "value": "top-left", "label": "Top left" },
-        { "value": "top-center", "label": "Top center" },
-        { "value": "top-right", "label": "Top right" },
-        { "value": "middle-left", "label": "Middle left" },
-        { "value": "middle-center", "label": "Middle center" },
-        { "value": "middle-right", "label": "Middle right" },
-        { "value": "bottom-left", "label": "Bottom left" },
-        { "value": "bottom-center", "label": "Bottom center" },
-        { "value": "bottom-right", "label": "Bottom right" }
-      ]
-    },
+    { "type": "text", "id": "bottom_strip", "label": "Bottom strip text", "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL" },
 
-    { "type": "select", "id": "text_align", "label": "Text align", "default": "center",
-      "options": [
-        { "value": "left", "label": "Left" },
-        { "value": "center", "label": "Center" },
-        { "value": "right", "label": "Right" }
-      ]
-    },
+    { "type": "color", "id": "bg_color", "label": "Background fallback color", "default": "#e7e7e7" },
+    { "type": "color", "id": "text_color", "label": "Text color", "default": "#111111" },
+    { "type": "color", "id": "border_color", "label": "Red outline color", "default": "#ff1e1e" },
+    { "type": "color", "id": "topbar_bg", "label": "Top bar background", "default": "#efefef" },
 
-    { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop now" },
-    { "type": "url", "id": "button_link", "label": "Button link" },
-
-    { "type": "color", "id": "heading_color", "label": "Heading color", "default": "#ffffff" },
-    { "type": "color", "id": "text_color", "label": "Text color", "default": "#ffffff" },
-    { "type": "color", "id": "overlay_color", "label": "Overlay color", "default": "#000000" },
-    { "type": "range", "id": "overlay_opacity", "label": "Overlay opacity", "min": 0, "max": 90, "step": 5, "default": 30 },
-
-    { "type": "color", "id": "button_bg", "label": "Button background", "default": "#ffffff" },
-    { "type": "color", "id": "button_text", "label": "Button text", "default": "#111111" },
-
-    { "type": "range", "id": "corner_radius", "label": "Corner radius", "min": 0, "max": 32, "step": 2, "default": 0 },
-
-    { "type": "checkbox", "id": "enable_parallax", "label": "Enable parallax effect", "default": false }
+    { "type": "color", "id": "choose_btn_bg", "label": "Choose button background", "default": "#f0e735" },
+    { "type": "color", "id": "choose_btn_text", "label": "Choose button text", "default": "#111111" },
+    { "type": "color", "id": "shop_btn_bg", "label": "Shop button background", "default": "#000000" },
+    { "type": "color", "id": "shop_btn_text", "label": "Shop button text", "default": "#ffffff" }
   ],
   "presets": [
-    { "name": "Custom Banner" }
+    { "name": "Gift Guide Banner" }
   ]
 }
 {% endschema %}
