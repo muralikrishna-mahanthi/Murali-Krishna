@@ -90,11 +90,6 @@
         "padding-block-end": 72
       }
     },
-    "new_banner_eUYgAT": {
-      "type": "New-banner",
-      "name": "New Banner",
-      "settings": {}
-    },
     "product_list_fa6P9H": {
       "type": "product-list",
       "blocks": {
@@ -292,7 +287,6 @@
   },
   "order": [
     "hero_jVaWmY",
-    "new_banner_eUYgAT",
     "product_list_fa6P9H"
   ]
 }
