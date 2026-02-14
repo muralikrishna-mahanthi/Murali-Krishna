@@ -32,63 +32,23 @@
         "button_text": "#ffffff"
       }
     },
-    "new_grid_JF9yT8": {
+    "new_grid_z33wKN": {
       "type": "New-grid",
       "blocks": {
-        "item_AteNEQ": {
-          "type": "item",
+        "product_slot_hBPE9z": {
+          "type": "product_slot",
           "settings": {
-            "alt_text": "Grid image",
-            "link": "shopify://products/black-leather-bag"
-          }
-        },
-        "item_QEJQcn": {
-          "type": "item",
-          "settings": {
-            "alt_text": "Grid image",
-            "link": "shopify://products/blue-silk-tuxedo"
-          }
-        },
-        "item_qge3kP": {
-          "type": "item",
-          "settings": {
-            "alt_text": "Grid image",
-            "link": ""
-          }
-        },
-        "item_Uyi3CG": {
-          "type": "item",
-          "settings": {
-            "alt_text": "Grid image",
-            "link": ""
-          }
-        },
-        "item_FpUakg": {
-          "type": "item",
-          "settings": {
-            "alt_text": "Grid image",
-            "link": ""
-          }
-        },
-        "item_FKwwmJ": {
-          "type": "item",
-          "settings": {
-            "alt_text": "Grid image",
-            "link": ""
+            "product": "black-leather-bag"
           }
         }
       },
       "block_order": [
-        "item_AteNEQ",
-        "item_QEJQcn",
-        "item_qge3kP",
-        "item_Uyi3CG",
-        "item_FpUakg",
-        "item_FKwwmJ"
+        "product_slot_hBPE9z"
       ],
-      "name": "Wild Grid 6",
+      "name": "Wild Grid Products + Popup",
       "settings": {
-        "heading": "Tisso vison in the wild"
+        "heading": "Tisso vison in the wild",
+        "collection": ""
       }
     },
     "hero_eJXFpF": {
@@ -200,7 +160,7 @@
   },
   "order": [
     "new_banner_YwVYaT",
-    "new_grid_JF9yT8",
+    "new_grid_z33wKN",
     "hero_eJXFpF"
   ]
 }
