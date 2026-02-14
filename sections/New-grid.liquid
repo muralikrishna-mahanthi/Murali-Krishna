@@ -1,0 +1,197 @@
+<section class="wild-grid wild-grid--{{ section.id }}">
+  <div class="wild-grid__container">
+    {% if section.settings.heading != blank %}
+      <h2 class="wild-grid__heading">{{ section.settings.heading }}</h2>
+    {% endif %}
+
+    <div class="wild-grid__grid js-wild-grid">
+      {% for block in section.blocks limit: 6 %}
+        <article class="wild-grid__card" {{ block.shopify_attributes }}>
+          {% if block.settings.link != blank %}
+            <a class="wild-grid__media-link" href="{{ block.settings.link }}" aria-label="{{ block.settings.alt_text | default: 'Open look' | escape }}">
+          {% else %}
+            <div class="wild-grid__media-link" role="group" aria-label="{{ block.settings.alt_text | default: 'Look image' | escape }}">
+          {% endif %}
+
+              {% if block.settings.image != blank %}
+                <img
+                  class="wild-grid__image"
+                  src="{{ block.settings.image | image_url: width: 900 }}"
+                  alt="{{ block.settings.alt_text | escape }}"
+                  loading="lazy"
+                  width="{{ block.settings.image.width }}"
+                  height="{{ block.settings.image.height }}"
+                >
+              {% else %}
+                {{ 'image' | placeholder_svg_tag: 'wild-grid__image wild-grid__image--placeholder' }}
+              {% endif %}
+
+              <span class="wild-grid__plus" aria-hidden="true">+</span>
+
+          {% if block.settings.link != blank %}
+            </a>
+          {% else %}
+            </div>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<style>
+  .wild-grid--{{ section.id }} {
+    padding: 52px 0 40px;
+    background: #efefef;
+  }
+
+  .wild-grid--{{ section.id }} .wild-grid__container {
+    width: min(1240px, calc(100% - 48px));
+    margin: 0 auto;
+  }
+
+  .wild-grid--{{ section.id }} .wild-grid__heading {
+    margin: 0 0 28px;
+    font-size: clamp(28px, 3.2vw, 52px);
+    font-weight: 400;
+    line-height: 1.1;
+    color: #111;
+  }
+
+  .wild-grid--{{ section.id }} .wild-grid__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .wild-grid--{{ section.id }} .wild-grid__card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .wild-grid--{{ section.id }} .wild-grid__media-link {
+    display: block;
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .wild-grid--{{ section.id }} .wild-grid__image {
+    width: 100%;
+    aspect-ratio: 4 / 4.4;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.28s ease;
+  }
+
+  .wild-grid--{{ section.id }} .wild-grid__plus {
+    position: absolute;
+    top: 52%;
+    left: 62%;
+    transform: translate(-50%, -50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: #f4f4f4;
+    color: #111;
+    font-size: 24px;
+    line-height: 32px;
+    text-align: center;
+    font-weight: 500;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+  }
+
+  .wild-grid--{{ section.id }} .wild-grid__media-link:hover .wild-grid__image {
+    transform: scale(1.03);
+  }
+
+  .wild-grid--{{ section.id }} .wild-grid__media-link:focus-visible {
+    outline: 2px solid #111;
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 767px) {
+    .wild-grid--{{ section.id }} {
+      padding: 34px 0 26px;
+    }
+
+    .wild-grid--{{ section.id }} .wild-grid__container {
+      width: calc(100% - 24px);
+    }
+
+    .wild-grid--{{ section.id }} .wild-grid__heading {
+      margin-bottom: 18px;
+      font-size: clamp(24px, 8vw, 40px);
+    }
+
+    .wild-grid--{{ section.id }} .wild-grid__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .wild-grid--{{ section.id }} .wild-grid__plus {
+      width: 28px;
+      height: 28px;
+      font-size: 21px;
+      line-height: 28px;
+      top: 50%;
+      left: 62%;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    var root = document.querySelector('.wild-grid--{{ section.id }}');
+    if (!root) return;
+
+    var links = root.querySelectorAll('.wild-grid__media-link[href]');
+    links.forEach(function (link) {
+      link.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          link.click();
+        }
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Wild Grid 6",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Tisso vison in the wild"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Grid Item",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "alt_text", "label": "Alt text", "default": "Grid image" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Wild Grid 6",
+      "blocks": [
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" }
+      ]
+    }
+  ]
+}
+{% endschema %}
