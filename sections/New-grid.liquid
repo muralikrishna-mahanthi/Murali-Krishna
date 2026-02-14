@@ -1,193 +1,643 @@
 {% liquid
-  assign source_collection = section.settings.collection
-  if source_collection == blank
-    assign source_collection = collections['all']
+  assign grid_id = 'wild-grid-' | append: section.id
+  assign fallback_collection = section.settings.collection
+  if fallback_collection == blank
+    assign fallback_collection = collections['all']
   endif
+
+  assign selected_handles = '|'
+  for block in section.blocks
+    if block.settings.product != blank
+      assign selected_handles = selected_handles | append: block.settings.product.handle | append: '|'
+    endif
+  endfor
 %}
 
-<section class="wild-grid-products">
-  <div class="wild-grid-products__container">
+<section id="{{ grid_id }}" class="wild-grid-products-popup">
+  <div class="wild-grid-products-popup__container">
     {% if section.settings.heading != blank %}
-      <h2 class="wild-grid-products__heading">{{ section.settings.heading }}</h2>
+      <h2 class="wild-grid-products-popup__heading">{{ section.settings.heading }}</h2>
     {% endif %}
 
-    <div class="wild-grid-products__grid js-wild-grid-products">
+    <div class="wild-grid-products-popup__grid">
       {% assign rendered_count = 0 %}
 
-      {% if source_collection != blank %}
-        {% for product in source_collection.products limit: 6 %}
-          <article class="wild-grid-products__item js-wild-grid-item">
-            <a class="wild-grid-products__link" href="{{ product.url }}" aria-label="{{ product.title | escape }}">
-              {% if product.featured_image != blank %}
+      {% for block in section.blocks limit: 6 %}
+        {% assign p = block.settings.product %}
+        {% if p != blank %}
+          {% assign card_id = grid_id | append: '-manual-' | append: block.id %}
+          <article class="wild-grid-products-popup__item" {{ block.shopify_attributes }}>
+            <button class="wild-grid-products-popup__trigger js-grid-trigger" type="button" data-card-id="{{ card_id }}">
+              {% if block.settings.custom_image != blank %}
                 <img
-                  class="wild-grid-products__image"
-                  src="{{ product.featured_image | image_url: width: 900 }}"
-                  alt="{{ product.featured_image.alt | default: product.title | escape }}"
-                  width="{{ product.featured_image.width }}"
-                  height="{{ product.featured_image.height }}"
+                  class="wild-grid-products-popup__image"
+                  src="{{ block.settings.custom_image | image_url: width: 900 }}"
+                  alt="{{ p.title | escape }}"
                   loading="lazy"
+                  width="{{ block.settings.custom_image.width }}"
+                  height="{{ block.settings.custom_image.height }}"
+                >
+              {% elsif p.featured_image != blank %}
+                <img
+                  class="wild-grid-products-popup__image"
+                  src="{{ p.featured_image | image_url: width: 900 }}"
+                  alt="{{ p.featured_image.alt | default: p.title | escape }}"
+                  loading="lazy"
+                  width="{{ p.featured_image.width }}"
+                  height="{{ p.featured_image.height }}"
                 >
               {% else %}
-                {{ 'product-1' | placeholder_svg_tag: 'wild-grid-products__image wild-grid-products__image--placeholder' }}
+                {{ 'product-1' | placeholder_svg_tag: 'wild-grid-products-popup__image wild-grid-products-popup__image--placeholder' }}
               {% endif %}
-              <span class="wild-grid-products__plus" aria-hidden="true">+</span>
-            </a>
+              <span class="wild-grid-products-popup__plus" aria-hidden="true">+</span>
+            </button>
+            <script type="application/json" class="js-grid-product-json" data-card-id="{{ card_id }}">{{ p | json }}</script>
           </article>
           {% assign rendered_count = rendered_count | plus: 1 %}
+        {% endif %}
+      {% endfor %}
+
+      {% if fallback_collection != blank %}
+        {% for p in fallback_collection.products %}
+          {% if rendered_count >= 6 %}
+            {% break %}
+          {% endif %}
+          {% assign handle_token = '|' | append: p.handle | append: '|' %}
+          {% unless selected_handles contains handle_token %}
+            {% assign card_id = grid_id | append: '-auto-' | append: p.id %}
+            <article class="wild-grid-products-popup__item">
+              <button class="wild-grid-products-popup__trigger js-grid-trigger" type="button" data-card-id="{{ card_id }}">
+                {% if p.featured_image != blank %}
+                  <img
+                    class="wild-grid-products-popup__image"
+                    src="{{ p.featured_image | image_url: width: 900 }}"
+                    alt="{{ p.featured_image.alt | default: p.title | escape }}"
+                    loading="lazy"
+                    width="{{ p.featured_image.width }}"
+                    height="{{ p.featured_image.height }}"
+                  >
+                {% else %}
+                  {{ 'product-1' | placeholder_svg_tag: 'wild-grid-products-popup__image wild-grid-products-popup__image--placeholder' }}
+                {% endif %}
+                <span class="wild-grid-products-popup__plus" aria-hidden="true">+</span>
+              </button>
+              <script type="application/json" class="js-grid-product-json" data-card-id="{{ card_id }}">{{ p | json }}</script>
+            </article>
+            {% assign rendered_count = rendered_count | plus: 1 %}
+          {% endunless %}
         {% endfor %}
       {% endif %}
 
       {% if rendered_count < 6 %}
         {% for i in (rendered_count..5) %}
-          <article class="wild-grid-products__item js-wild-grid-item wild-grid-products__item--empty">
-            <div class="wild-grid-products__link" role="img" aria-label="Placeholder image">
-              {{ 'product-1' | placeholder_svg_tag: 'wild-grid-products__image wild-grid-products__image--placeholder' }}
-              <span class="wild-grid-products__plus" aria-hidden="true">+</span>
+          <article class="wild-grid-products-popup__item wild-grid-products-popup__item--placeholder">
+            <div class="wild-grid-products-popup__trigger is-disabled" aria-hidden="true">
+              {{ 'product-1' | placeholder_svg_tag: 'wild-grid-products-popup__image wild-grid-products-popup__image--placeholder' }}
+              <span class="wild-grid-products-popup__plus" aria-hidden="true">+</span>
             </div>
           </article>
         {% endfor %}
       {% endif %}
     </div>
   </div>
+
+  <div class="wild-grid-products-popup__modal js-grid-modal" hidden>
+    <div class="wild-grid-products-popup__backdrop js-grid-close"></div>
+    <div class="wild-grid-products-popup__dialog" role="dialog" aria-modal="true" aria-label="Product quick view">
+      <button class="wild-grid-products-popup__close js-grid-close" type="button" aria-label="Close">×</button>
+
+      <div class="wild-grid-products-popup__modal-head">
+        <img class="wild-grid-products-popup__modal-image js-modal-image" src="" alt="">
+        <div class="wild-grid-products-popup__meta">
+          <h3 class="wild-grid-products-popup__modal-title js-modal-title"></h3>
+          <p class="wild-grid-products-popup__modal-price js-modal-price"></p>
+          <p class="wild-grid-products-popup__modal-desc js-modal-desc"></p>
+        </div>
+      </div>
+
+      <div class="wild-grid-products-popup__option-group js-color-group is-hidden">
+        <p class="wild-grid-products-popup__label">Color</p>
+        <div class="wild-grid-products-popup__swatches js-color-options"></div>
+      </div>
+
+      <div class="wild-grid-products-popup__option-group js-size-group is-hidden">
+        <p class="wild-grid-products-popup__label">Size</p>
+        <div class="wild-grid-products-popup__select-wrap">
+          <select class="wild-grid-products-popup__select js-size-select" aria-label="Choose size"></select>
+        </div>
+      </div>
+
+      <button class="wild-grid-products-popup__add js-add-to-cart" type="button">
+        <span>ADD TO CART</span>
+        <span aria-hidden="true">→</span>
+      </button>
+    </div>
+  </div>
 </section>
 
 <style>
-  .wild-grid-products {
+  #{{ grid_id }} {
     background: #ededed;
     padding: 48px 0;
   }
 
-  .wild-grid-products__container {
+  #{{ grid_id }} .wild-grid-products-popup__container {
     width: min(1240px, calc(100% - 48px));
     margin: 0 auto;
   }
 
-  .wild-grid-products__heading {
-    margin: 0 0 26px;
-    color: #111;
-    font-size: clamp(30px, 3.2vw, 52px);
+  #{{ grid_id }} .wild-grid-products-popup__heading {
+    margin: 0 0 24px;
+    font-size: clamp(32px, 3.2vw, 56px);
     font-weight: 400;
     line-height: 1.1;
+    color: #111;
   }
 
-  .wild-grid-products__grid {
+  #{{ grid_id }} .wild-grid-products-popup__grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: repeat(2, auto);
     gap: 18px;
   }
 
-  .wild-grid-products__item {
+  #{{ grid_id }} .wild-grid-products-popup__item {
     overflow: hidden;
   }
 
-  .wild-grid-products__link {
+  #{{ grid_id }} .wild-grid-products-popup__trigger {
+    border: 0;
+    padding: 0;
+    background: transparent;
+    width: 100%;
     display: block;
     position: relative;
-    text-decoration: none;
-    color: inherit;
+    cursor: pointer;
   }
 
-  .wild-grid-products__image {
+  #{{ grid_id }} .wild-grid-products-popup__trigger.is-disabled {
+    cursor: default;
+    pointer-events: none;
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__image {
     width: 100%;
     aspect-ratio: 4 / 4.4;
     object-fit: cover;
     display: block;
-    transform: scale(1);
-    transition: transform 0.3s ease;
   }
 
-  .wild-grid-products__plus {
+  #{{ grid_id }} .wild-grid-products-popup__plus {
     position: absolute;
     top: 52%;
     left: 62%;
     transform: translate(-50%, -50%);
-    width: 30px;
-    height: 30px;
+    width: 31px;
+    height: 31px;
     border-radius: 999px;
-    background: #f3f3f3;
+    background: #f4f4f4;
     color: #111;
     font-size: 22px;
-    line-height: 30px;
+    line-height: 31px;
     text-align: center;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
     pointer-events: none;
   }
 
-  .wild-grid-products__link:hover .wild-grid-products__image {
-    transform: scale(1.03);
+  #{{ grid_id }} .wild-grid-products-popup__modal[hidden] {
+    display: none;
   }
 
-  .wild-grid-products__item--empty .wild-grid-products__image {
-    opacity: 0.55;
+  #{{ grid_id }} .wild-grid-products-popup__modal {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
   }
 
-  .js-wild-grid-item {
-    opacity: 0;
-    transform: translateY(12px);
-    transition: opacity 0.35s ease, transform 0.35s ease;
+  #{{ grid_id }} .wild-grid-products-popup__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.28);
   }
 
-  .js-wild-grid-item.is-inview {
-    opacity: 1;
-    transform: translateY(0);
+  #{{ grid_id }} .wild-grid-products-popup__dialog {
+    position: relative;
+    z-index: 1;
+    width: min(92vw, 540px);
+    margin: min(9vh, 70px) auto 20px;
+    background: #fff;
+    border: 1px solid #d7d7d7;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.24);
+    padding: 24px;
+    max-height: calc(100vh - 90px);
+    overflow: auto;
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    border: 0;
+    background: transparent;
+    font-size: 34px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__modal-head {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__modal-image {
+    width: 100%;
+    aspect-ratio: 1 / 1.1;
+    object-fit: cover;
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__modal-title {
+    margin: 0 0 10px;
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 1.15;
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__modal-price {
+    margin: 0 0 8px;
+    font-size: 36px;
+    line-height: 1.1;
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__modal-desc {
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.3;
+    color: #2a2a2a;
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__option-group {
+    margin-top: 16px;
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__label {
+    margin: 0 0 8px;
+    font-size: 28px;
+    line-height: 1.1;
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__swatches {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__swatch {
+    border: 1px solid #818181;
+    background: #fff;
+    min-height: 58px;
+    font-size: 34px;
+    text-align: left;
+    padding: 0 14px;
+    cursor: pointer;
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__swatch.is-active {
+    border: 2px solid #1a5eb8;
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__select-wrap {
+    position: relative;
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__select {
+    width: 100%;
+    border: 1px solid #8c8c8c;
+    min-height: 58px;
+    font-size: 34px;
+    padding: 0 52px 0 14px;
+    appearance: none;
+    background: #fff;
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__select-wrap::after {
+    content: "⌄";
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-52%);
+    font-size: 34px;
+    pointer-events: none;
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__add {
+    margin-top: 22px;
+    width: 100%;
+    min-height: 62px;
+    border: 0;
+    background: #000;
+    color: #fff;
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    cursor: pointer;
+  }
+
+  #{{ grid_id }} .wild-grid-products-popup__add:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  #{{ grid_id }} .is-hidden {
+    display: none;
   }
 
   @media (max-width: 767px) {
-    .wild-grid-products {
+    #{{ grid_id }} {
       padding: 30px 0;
     }
 
-    .wild-grid-products__container {
+    #{{ grid_id }} .wild-grid-products-popup__container {
       width: calc(100% - 24px);
     }
 
-    .wild-grid-products__heading {
-      margin-bottom: 16px;
-      font-size: clamp(26px, 8vw, 40px);
+    #{{ grid_id }} .wild-grid-products-popup__heading {
+      font-size: clamp(28px, 8vw, 42px);
+      margin-bottom: 14px;
     }
 
-    .wild-grid-products__grid {
+    #{{ grid_id }} .wild-grid-products-popup__grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       grid-template-rows: repeat(3, auto);
       gap: 10px;
     }
 
-    .wild-grid-products__plus {
+    #{{ grid_id }} .wild-grid-products-popup__plus {
       width: 26px;
       height: 26px;
       line-height: 26px;
-      font-size: 20px;
+      font-size: 18px;
+    }
+
+    #{{ grid_id }} .wild-grid-products-popup__dialog {
+      width: calc(100vw - 24px);
+      margin: 12px auto;
+      max-height: calc(100vh - 24px);
+      padding: 16px;
+    }
+
+    #{{ grid_id }} .wild-grid-products-popup__modal-head {
+      grid-template-columns: 94px 1fr;
+      gap: 10px;
+    }
+
+    #{{ grid_id }} .wild-grid-products-popup__modal-title {
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    #{{ grid_id }} .wild-grid-products-popup__modal-price {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    #{{ grid_id }} .wild-grid-products-popup__modal-desc {
+      font-size: 16px;
+    }
+
+    #{{ grid_id }} .wild-grid-products-popup__label {
+      font-size: 16px;
+    }
+
+    #{{ grid_id }} .wild-grid-products-popup__swatch {
+      min-height: 44px;
+      font-size: 24px;
+    }
+
+    #{{ grid_id }} .wild-grid-products-popup__select {
+      min-height: 44px;
+      font-size: 24px;
+    }
+
+    #{{ grid_id }} .wild-grid-products-popup__add {
+      min-height: 50px;
+      font-size: 22px;
     }
   }
 </style>
 
 <script>
   (function () {
-    var root = document.querySelector('.js-wild-grid-products');
-    if (!root) return;
+    var section = document.getElementById('{{ grid_id }}');
+    if (!section) return;
 
-    var items = root.querySelectorAll('.js-wild-grid-item');
-    if (!items.length) return;
+    var modal = section.querySelector('.js-grid-modal');
+    var closeEls = section.querySelectorAll('.js-grid-close');
+    var triggers = section.querySelectorAll('.js-grid-trigger');
+    var jsonEls = section.querySelectorAll('.js-grid-product-json');
 
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-inview');
-          observer.unobserve(entry.target);
-        }
+    var titleEl = section.querySelector('.js-modal-title');
+    var priceEl = section.querySelector('.js-modal-price');
+    var descEl = section.querySelector('.js-modal-desc');
+    var imageEl = section.querySelector('.js-modal-image');
+
+    var colorGroup = section.querySelector('.js-color-group');
+    var colorOptionsWrap = section.querySelector('.js-color-options');
+    var sizeGroup = section.querySelector('.js-size-group');
+    var sizeSelect = section.querySelector('.js-size-select');
+    var addBtn = section.querySelector('.js-add-to-cart');
+
+    var productMap = {};
+    var currentProduct = null;
+    var selectedVariant = null;
+    var selectedOptions = [];
+
+    jsonEls.forEach(function (el) {
+      try {
+        productMap[el.dataset.cardId] = JSON.parse(el.textContent);
+      } catch (e) {}
+    });
+
+    function money(cents) {
+      if (window.Shopify && typeof window.Shopify.formatMoney === 'function') {
+        return window.Shopify.formatMoney(cents);
+      }
+      return (cents / 100).toFixed(2) + '€';
+    }
+
+    function stripHtml(html) {
+      var div = document.createElement('div');
+      div.innerHTML = html || '';
+      return (div.textContent || div.innerText || '').trim();
+    }
+
+    function findOptionIndex(product, key) {
+      if (!product || !product.options) return -1;
+      var lower = key.toLowerCase();
+      for (var i = 0; i < product.options.length; i++) {
+        if ((product.options[i] || '').toLowerCase().indexOf(lower) > -1) return i;
+      }
+      return -1;
+    }
+
+    function findMatchingVariant() {
+      if (!currentProduct || !currentProduct.variants) return null;
+      return currentProduct.variants.find(function (variant) {
+        return variant.options.every(function (opt, idx) {
+          return !selectedOptions[idx] || selectedOptions[idx] === opt;
+        });
+      }) || null;
+    }
+
+    function renderColorOptions(colorIndex) {
+      colorOptionsWrap.innerHTML = '';
+      if (colorIndex < 0) {
+        colorGroup.classList.add('is-hidden');
+        return;
+      }
+
+      var values = (currentProduct.options_with_values[colorIndex] || {}).values || [];
+      if (!values.length) {
+        colorGroup.classList.add('is-hidden');
+        return;
+      }
+
+      colorGroup.classList.remove('is-hidden');
+
+      values.forEach(function (value) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'wild-grid-products-popup__swatch' + (selectedOptions[colorIndex] === value ? ' is-active' : '');
+        btn.textContent = value;
+        btn.addEventListener('click', function () {
+          selectedOptions[colorIndex] = value;
+          renderColorOptions(colorIndex);
+          refreshVariantState();
+        });
+        colorOptionsWrap.appendChild(btn);
       });
-    }, { threshold: 0.2 });
+    }
 
-    items.forEach(function (item) {
-      observer.observe(item);
+    function renderSizeOptions(sizeIndex) {
+      sizeSelect.innerHTML = '';
+      if (sizeIndex < 0) {
+        sizeGroup.classList.add('is-hidden');
+        return;
+      }
+
+      var values = (currentProduct.options_with_values[sizeIndex] || {}).values || [];
+      if (!values.length) {
+        sizeGroup.classList.add('is-hidden');
+        return;
+      }
+
+      sizeGroup.classList.remove('is-hidden');
+
+      values.forEach(function (value) {
+        var option = document.createElement('option');
+        option.value = value;
+        option.textContent = value;
+        if (selectedOptions[sizeIndex] === value) option.selected = true;
+        sizeSelect.appendChild(option);
+      });
+    }
+
+    function refreshVariantState() {
+      selectedVariant = findMatchingVariant();
+      if (selectedVariant) {
+        priceEl.textContent = money(selectedVariant.price);
+        addBtn.disabled = !selectedVariant.available;
+      } else {
+        addBtn.disabled = true;
+      }
+    }
+
+    function openModal(cardId) {
+      var product = productMap[cardId];
+      if (!product) return;
+
+      currentProduct = product;
+      selectedVariant = product.variants && product.variants.length ? product.variants[0] : null;
+      selectedOptions = selectedVariant && selectedVariant.options ? selectedVariant.options.slice() : [];
+
+      titleEl.textContent = product.title || '';
+      priceEl.textContent = selectedVariant ? money(selectedVariant.price) : '';
+      descEl.textContent = stripHtml(product.description).slice(0, 130);
+
+      if (product.featured_image && product.featured_image.src) {
+        imageEl.src = product.featured_image.src;
+      } else {
+        imageEl.src = '';
+      }
+      imageEl.alt = product.title || 'Product';
+
+      var colorIndex = findOptionIndex(product, 'color');
+      if (colorIndex < 0) colorIndex = findOptionIndex(product, 'colour');
+      var sizeIndex = findOptionIndex(product, 'size');
+
+      renderColorOptions(colorIndex);
+      renderSizeOptions(sizeIndex);
+
+      sizeSelect.onchange = function () {
+        if (sizeIndex > -1) {
+          selectedOptions[sizeIndex] = sizeSelect.value;
+          refreshVariantState();
+        }
+      };
+
+      refreshVariantState();
+
+      modal.hidden = false;
+      document.body.classList.add('wild-grid-popup-open');
+    }
+
+    function closeModal() {
+      modal.hidden = true;
+      document.body.classList.remove('wild-grid-popup-open');
+      currentProduct = null;
+      selectedVariant = null;
+    }
+
+    triggers.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        openModal(btn.dataset.cardId);
+      });
+    });
+
+    closeEls.forEach(function (btn) {
+      btn.addEventListener('click', closeModal);
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && !modal.hidden) closeModal();
+    });
+
+    addBtn.addEventListener('click', function () {
+      if (!selectedVariant || !selectedVariant.id) return;
+
+      addBtn.disabled = true;
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ id: selectedVariant.id, quantity: 1 })
+      })
+        .then(function (res) { return res.json(); })
+        .then(function () {
+          closeModal();
+          document.dispatchEvent(new CustomEvent('cart:refresh'));
+        })
+        .catch(function () {
+          addBtn.disabled = false;
+        });
     });
   })();
 </script>
 
 {% schema %}
 {
-  "name": "Wild Grid Products (Auto)",
+  "name": "New grid",
   "settings": [
     {
       "type": "text",
@@ -198,13 +648,33 @@
     {
       "type": "collection",
       "id": "collection",
-      "label": "Collection",
-      "info": "First 6 products from this collection will be shown automatically."
+      "label": "Auto-fill collection",
+      "info": "Used to fill remaining slots up to 6 items."
     }
   ],
+  "blocks": [
+    {
+      "type": "product_slot",
+      "name": "Manual product",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_image",
+          "label": "Custom tile image (optional)"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
   "presets": [
     {
-      "name": "Wild Grid Products (Auto)"
+      "name": "Wild Grid Products + Popup"
     }
   ]
 }
