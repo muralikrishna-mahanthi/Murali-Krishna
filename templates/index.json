@@ -32,40 +32,40 @@
         "button_text": "#ffffff"
       }
     },
-    "new_grid_BwXeXT": {
+    "new_grid_NCwmQi": {
       "type": "New-grid",
       "blocks": {
-        "product_item_y7nGRw": {
+        "product_item_fBDfQE": {
           "type": "product_item",
           "settings": {
             "product": "black-leather-bag"
           }
         },
-        "product_item_NcAmHx": {
+        "product_item_cMbtim": {
           "type": "product_item",
           "settings": {
             "product": "blue-silk-tuxedo"
           }
         },
-        "product_item_tdyAjH": {
+        "product_item_wgLqdH": {
           "type": "product_item",
           "settings": {
             "product": "chequered-red-shirt"
           }
         },
-        "product_item_JzAbiC": {
+        "product_item_thPkh4": {
           "type": "product_item",
           "settings": {
             "product": "classic-leather-jacket"
           }
         },
-        "product_item_bz9qGd": {
+        "product_item_BDR8WY": {
           "type": "product_item",
           "settings": {
             "product": "classic-varsity-top"
           }
         },
-        "product_item_GjrXpX": {
+        "product_item_mLX8DJ": {
           "type": "product_item",
           "settings": {
             "product": "dark-denim-top"
@@ -73,14 +73,14 @@
         }
       },
       "block_order": [
-        "product_item_y7nGRw",
-        "product_item_NcAmHx",
-        "product_item_tdyAjH",
-        "product_item_JzAbiC",
-        "product_item_bz9qGd",
-        "product_item_GjrXpX"
+        "product_item_fBDfQE",
+        "product_item_cMbtim",
+        "product_item_wgLqdH",
+        "product_item_thPkh4",
+        "product_item_BDR8WY",
+        "product_item_mLX8DJ"
       ],
-      "name": "Product Grid Popup (6)",
+      "name": "Product Grid",
       "settings": {
         "heading": "Tisso vison in the wild"
       }
@@ -194,7 +194,7 @@
   },
   "order": [
     "new_banner_YwVYaT",
-    "new_grid_BwXeXT",
+    "new_grid_NCwmQi",
     "hero_eJXFpF"
   ]
 }
