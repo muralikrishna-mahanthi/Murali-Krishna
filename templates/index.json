@@ -32,20 +32,20 @@
         "button_text": "#ffffff"
       }
     },
-    "new_grid_z33wKN": {
+    "new_grid_T3R97X": {
       "type": "New-grid",
       "blocks": {
-        "product_slot_hBPE9z": {
-          "type": "product_slot",
+        "product_item_tW4fRE": {
+          "type": "product_item",
           "settings": {
             "product": "black-leather-bag"
           }
         }
       },
       "block_order": [
-        "product_slot_hBPE9z"
+        "product_item_tW4fRE"
       ],
-      "name": "Wild Grid Products + Popup",
+      "name": "Product Grid Popup (6)",
       "settings": {
         "heading": "Tisso vison in the wild",
         "collection": ""
@@ -160,7 +160,7 @@
   },
   "order": [
     "new_banner_YwVYaT",
-    "new_grid_z33wKN",
+    "new_grid_T3R97X",
     "hero_eJXFpF"
   ]
 }
