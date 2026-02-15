@@ -1,17 +1,5 @@
-```liquid
 {% liquid
   assign grid_id = 'product-grid-popup-' | append: section.id
-  assign fallback_collection = section.settings.collection
-  if fallback_collection == blank
-    assign fallback_collection = collections['all']
-  endif
-
-  assign selected_handles = '|'
-  for block in section.blocks
-    if block.settings.product != blank
-      assign selected_handles = selected_handles | append: block.settings.product.handle | append: '|'
-    endif
-  endfor
 %}
 
 <section id="{{ grid_id }}" class="pgp">
@@ -21,76 +9,33 @@
     {% endif %}
 
     <div class="pgp__grid">
-      {% assign rendered_count = 0 %}
+  {% assign rendered_count = 0 %}
 
-      {% for block in section.blocks limit: 6 %}
-        {% assign p = block.settings.product %}
-        {% if p != blank %}
-          {% assign card_id = grid_id | append: '-manual-' | append: block.id %}
-          <article class="pgp__item" {{ block.shopify_attributes }}>
-            <button class="pgp__trigger js-pgp-open" type="button" data-card-id="{{ card_id }}" aria-label="Open {{ p.title | escape }}">
-              {% if p.featured_image %}
-                <img
-                  class="pgp__image"
-                  src="{{ p.featured_image | image_url: width: 900 }}"
-                  alt="{{ p.featured_image.alt | default: p.title | escape }}"
-                  loading="lazy"
-                  width="{{ p.featured_image.width }}"
-                  height="{{ p.featured_image.height }}"
-                >
-              {% else %}
-                {{ 'product-1' | placeholder_svg_tag: 'pgp__image pgp__image--placeholder' }}
-              {% endif %}
-              <span class="pgp__plus" aria-hidden="true">+</span>
-            </button>
-            <script type="application/json" class="js-pgp-product" data-card-id="{{ card_id }}">{{ p | json }}</script>
-          </article>
-          {% assign rendered_count = rendered_count | plus: 1 %}
-        {% endif %}
-      {% endfor %}
-
-      {% if fallback_collection != blank %}
-        {% for p in fallback_collection.products %}
-          {% if rendered_count >= 6 %}
-            {% break %}
+  {% for block in section.blocks limit: 6 %}
+    {% assign p = block.settings.product %}
+    {% if p != blank %}
+      {% assign card_id = grid_id | append: '-manual-' | append: block.id %}
+      <article class="pgp__item" {{ block.shopify_attributes }}>
+        <button class="pgp__trigger js-pgp-open" type="button" data-card-id="{{ card_id }}" aria-label="Open {{ p.title | escape }}">
+          {% if p.featured_image %}
+            <img
+              class="pgp__image"
+              src="{{ p.featured_image | image_url: width: 900 }}"
+              alt="{{ p.featured_image.alt | default: p.title | escape }}"
+              loading="lazy"
+              width="{{ p.featured_image.width }}"
+              height="{{ p.featured_image.height }}"
+            >
           {% endif %}
-          {% assign token = '|' | append: p.handle | append: '|' %}
-          {% unless selected_handles contains token %}
-            {% assign card_id = grid_id | append: '-auto-' | append: p.id %}
-            <article class="pgp__item">
-              <button class="pgp__trigger js-pgp-open" type="button" data-card-id="{{ card_id }}" aria-label="Open {{ p.title | escape }}">
-                {% if p.featured_image %}
-                  <img
-                    class="pgp__image"
-                    src="{{ p.featured_image | image_url: width: 900 }}"
-                    alt="{{ p.featured_image.alt | default: p.title | escape }}"
-                    loading="lazy"
-                    width="{{ p.featured_image.width }}"
-                    height="{{ p.featured_image.height }}"
-                  >
-                {% else %}
-                  {{ 'product-1' | placeholder_svg_tag: 'pgp__image pgp__image--placeholder' }}
-                {% endif %}
-                <span class="pgp__plus" aria-hidden="true">+</span>
-              </button>
-              <script type="application/json" class="js-pgp-product" data-card-id="{{ card_id }}">{{ p | json }}</script>
-            </article>
-            {% assign rendered_count = rendered_count | plus: 1 %}
-          {% endunless %}
-        {% endfor %}
-      {% endif %}
+          <span class="pgp__plus" aria-hidden="true">+</span>
+        </button>
+        <script type="application/json" class="js-pgp-product" data-card-id="{{ card_id }}">{{ p | json }}</script>
+      </article>
+      {% assign rendered_count = rendered_count | plus: 1 %}
+    {% endif %}
+  {% endfor %}
+</div>
 
-      {% if rendered_count < 6 %}
-        {% for i in (rendered_count..5) %}
-          <article class="pgp__item pgp__item--placeholder">
-            <div class="pgp__trigger pgp__trigger--disabled" aria-hidden="true">
-              {{ 'product-1' | placeholder_svg_tag: 'pgp__image pgp__image--placeholder' }}
-              <span class="pgp__plus" aria-hidden="true">+</span>
-            </div>
-          </article>
-        {% endfor %}
-      {% endif %}
-    </div>
   </div>
 
   <div class="pgp-modal js-pgp-modal" hidden>
@@ -99,7 +44,7 @@
       <button class="pgp-modal__close js-pgp-close" type="button" aria-label="Close">×</button>
 
       <div class="pgp-modal__head">
-        <img class="pgp-modal__image js-pgp-image" src="" alt="">
+        <img class="pgp-modal__image js-pgp-image" src="" alt="" width="" height="">
         <div>
           <h3 class="pgp-modal__title js-pgp-title"></h3>
           <p class="pgp-modal__price js-pgp-price"></p>
@@ -115,6 +60,11 @@
 </section>
 
 <style>
+
+  #{{ grid_id }} .pgp__grid:empty {
+  display: none;
+}
+
   #{{ grid_id }}.pgp {
     background: #e9e9e9;
     padding: 48px 0;
@@ -556,12 +506,6 @@
       "id": "heading",
       "label": "Heading",
       "default": "Tisso vison in the wild"
-    },
-    {
-      "type": "collection",
-      "id": "collection",
-      "label": "Auto-fill collection",
-      "info": "Used to fill remaining slots up to 6 products."
     }
   ],
   "blocks": [
@@ -586,4 +530,3 @@
   ]
 }
 {% endschema %}
-```
